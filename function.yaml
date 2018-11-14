@@ -1,0 +1,9 @@
+search:
+  code:
+    bucket: CUSTOM_CODE
+    file: infomotion-7.5.0-SNAPSHOT-cloudfn.tar.gz
+  handler: com.nec.baas.cloudfn.InfoMotion::search
+  env:
+    spec: java
+    timeout: 60
+    memorySize: 128

@@ -1,0 +1,17 @@
+<assembly>
+    <!-- ユーザコードのjarを、tgzアーカイブする -->
+    <id>cloudfn</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>*-usercode-with-dependencies.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

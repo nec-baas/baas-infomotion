@@ -1,0 +1,11 @@
+swagger: '2.0'
+basePath: /infomotion
+x-auth-appkey: false
+produces:
+  - application/json
+paths:
+  /search/{bucketname}:
+    get:
+      operationId: search
+      summary: infomotion
+
