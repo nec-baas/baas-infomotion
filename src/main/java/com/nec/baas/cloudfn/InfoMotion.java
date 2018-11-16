@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import com.nec.baas.cloudfn.sdk.ApigwResponse;
 import com.nec.baas.cloudfn.sdk.Context;
 import com.nec.baas.core.NbErrorInfo;
@@ -63,7 +65,9 @@ public class InfoMotion {
                 clause.and(endClause);
             }
         } catch (NumberFormatException e) {
-            ApigwResponse response = ApigwResponse.status(400).entity("Parameter Error").build();
+            NbJSONObject msg = new NbJSONObject();
+            msg.put("error", "Parameter Error");
+            ApigwResponse response = ApigwResponse.status(400).contentType(MediaType.APPLICATION_JSON).entity(msg).build();
             context.fail(response);
             context.logger().warn("query parameter error", e);
             return;
@@ -73,7 +77,9 @@ public class InfoMotion {
             String whereJson = queryParams.get(QUERY_PARAM_WHERE).get(0);
             NbJSONObject whereJsonObject = NbJSONParser.parse(whereJson);
             if (whereJsonObject == null) {
-                ApigwResponse response = ApigwResponse.status(400).entity("Parameter Error").build();
+                NbJSONObject msg = new NbJSONObject();
+                msg.put("error", "Parameter Error");
+                ApigwResponse response = ApigwResponse.status(400).contentType(MediaType.APPLICATION_JSON).entity(msg).build();
                 context.fail(response);
                 context.logger().warn("query parameter error");
                 return;
@@ -98,14 +104,14 @@ public class InfoMotion {
                 try {
                     context.succeed(createResponse(objects));
                 } catch (ParseException e) {
-                    ApigwResponse response = ApigwResponse.status(500).entity(e.getMessage()).build();
+                    ApigwResponse response = ApigwResponse.status(500).contentType(MediaType.APPLICATION_JSON).entity(e.getMessage()).build();
                     context.fail(response);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, NbErrorInfo errorInfo) {
-                ApigwResponse response = ApigwResponse.status(statusCode).entity(errorInfo.getReason()).build();
+                ApigwResponse response = ApigwResponse.status(statusCode).contentType(MediaType.APPLICATION_JSON).entity(errorInfo.getReason()).build();
                 context.fail(response);
             }
         });
@@ -143,6 +149,6 @@ public class InfoMotion {
             response.add(json);
         }
 
-        return ApigwResponse.ok().entity(response.toString()).build();
+        return ApigwResponse.ok().contentType(MediaType.APPLICATION_JSON).entity(response.toString()).build();
     }
 }
