@@ -199,53 +199,38 @@ class InfoMotionTest {
 
     private Answer<Void> createSuccessAnswer() {
 
-        Answer<Void> ans = new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+        return invocation -> {
 
-                NbCallback<List<NbObject>> cb = (NbCallback<List<NbObject>>) invocation.getArgument(1);
-                List<NbObject> ret = createSucceedResponseData();
+            NbCallback<List<NbObject>> cb = invocation.getArgument(1);
+            List<NbObject> ret = createSucceedResponseData();
 
-                cb.onSuccess(ret);
-                return null;
-            }
+            cb.onSuccess(ret);
+            return null;
         };
-
-        return ans;
     }
 
     private Answer<Void> createSuccessAnswerInvalidUpdatedAt() {
 
-        Answer<Void> ans = new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+        return invocation -> {
 
-                NbCallback<List<NbObject>> cb = (NbCallback<List<NbObject>>) invocation.getArgument(1);
-                List<NbObject> ret = createSucceedResponseDataInvalidUpdatedAt();
+            NbCallback<List<NbObject>> cb = invocation.getArgument(1);
+            List<NbObject> ret = createSucceedResponseDataInvalidUpdatedAt();
 
-                cb.onSuccess(ret);
-                return null;
-            }
+            cb.onSuccess(ret);
+            return null;
         };
-
-        return ans;
     }
 
     private Answer<Void> createFailureAnswer(int status, String reason) {
 
-        Answer<Void> ans = new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+        return invocation -> {
 
-                NbCallback<List<NbObject>> cb = (NbCallback<List<NbObject>>) invocation.getArgument(1);
+            NbCallback<List<NbObject>> cb = invocation.getArgument(1);
 
-                NbErrorInfo err = new NbErrorInfo(reason);
-                cb.onFailure(status, err);
-                return null;
-            }
+            NbErrorInfo err = new NbErrorInfo(reason);
+            cb.onFailure(status, err);
+            return null;
         };
-
-        return ans;
     }
 
     private void executeQuery(ApigwResponse verifyResponse, Answer<Void> ans, String bucketName) {
