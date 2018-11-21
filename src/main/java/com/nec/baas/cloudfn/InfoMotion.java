@@ -1,9 +1,8 @@
 package com.nec.baas.cloudfn;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +29,8 @@ public class InfoMotion {
     /** PathParameter : bucketname */
     private static final String PATH_PARAM_BUCKETNAME = "bucketname";
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
     public static void search(Map<String, Object> event, Context context) {
         NbClause clause = new NbClause();
         NbQuery query = new NbQuery();
@@ -44,14 +45,13 @@ public class InfoMotion {
 
         // QueryParams
         query.setClause(clause);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
         try {
             if (queryParams.containsKey(QUERY_PARAM_START)) {
                 long start = Long.parseLong(queryParams.get(QUERY_PARAM_START).get(0));
 
                 NbClause startClause = new NbClause();
-                startClause.greaterThanOrEqual("updatedAt", sdf.format(new Date(start)));
+                startClause.greaterThanOrEqual("updatedAt", DATE_FORMAT.format(new Date(start)));
                 clause.and(startClause);
             }
 
@@ -59,7 +59,7 @@ public class InfoMotion {
                 long end = Long.parseLong(queryParams.get(QUERY_PARAM_END).get(0));
 
                 NbClause endClause = new NbClause();
-                endClause.lessThanOrEqual("updatedAt", sdf.format(new Date(end)));
+                endClause.lessThanOrEqual("updatedAt", DATE_FORMAT.format(new Date(end)));
                 clause.and(endClause);
             }
         } catch (NumberFormatException e) {
@@ -127,11 +127,7 @@ public class InfoMotion {
             NbJSONObject value = new NbJSONObject();
 
             // timestamp
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(sdf.parse(object.getUpdatedTime()));
-
-            long timestamp = cal.getTimeInMillis();
+            long timestamp = DATE_FORMAT.parse(object.getUpdatedTime()).getTime();
             json.put("timestamp", timestamp);
 
             // value
