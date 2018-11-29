@@ -111,7 +111,8 @@ public class InfoMotion {
 
             @Override
             public void onFailure(int statusCode, NbErrorInfo errorInfo) {
-                ApigwResponse response = ApigwResponse.status(statusCode).contentType(MediaType.APPLICATION_JSON).entity(errorInfo.getReason()).build();
+                ApigwResponse response =
+                        ApigwResponse.status(statusCode).contentType(MediaType.APPLICATION_JSON).entity(errorInfo.getReason()).build();
                 context.fail(response);
             }
         });
@@ -131,21 +132,22 @@ public class InfoMotion {
         NbJSONArray<NbJSONObject> response = new NbJSONArray<>();
         for (NbObject object : objects) {
             NbJSONObject json = new NbJSONObject();
-            NbJSONObject value = new NbJSONObject();
+
+            // value
+            json.put("_id", object.getObjectId());
+            json.put("createdAt", object.getCreatedTime());
+            json.put("updatedAt", object.getUpdatedTime());
+
+            object.keySet().forEach(key -> json.put(key, object.get(key)));
+
+            // rename ts
+            if (json.containsKey("ts")) {
+                json.put("_ts", json.get("ts"));
+            }
 
             // timestamp
             long timestamp = dateFormat.parse(object.getUpdatedTime()).getTime();
-            json.put("timestamp", timestamp);
-
-            // value
-            value.put("_id", object.getObjectId());
-            value.put("createdAt", object.getCreatedTime());
-            value.put("updatedAt", object.getUpdatedTime());
-
-            for (String key : object.keySet()) {
-                value.put(key, object.get(key));
-            }
-            json.put("value", value);
+            json.put("ts", timestamp);
 
             response.add(json);
         }

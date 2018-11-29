@@ -18,12 +18,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
 import org.slf4j.Logger;
 
-import com.nec.baas.cloudfn.InfoMotion;
 import com.nec.baas.cloudfn.sdk.ApigwResponse;
 import com.nec.baas.cloudfn.sdk.ClientContext;
 import com.nec.baas.cloudfn.sdk.Context;
@@ -143,13 +141,37 @@ class InfoMotionTest {
     }
 
     /**
+     * クエリ結果に"ts"キーが含まれている場合は"_ts"キーに格納されること
+     */
+    @Test
+    public void testTsKeyDuplicated() {
+        when(clientContext.queryParams()).thenReturn(createQueryParams(null, null, null));
+        when(clientContext.pathParams()).thenReturn(createPathParams(BUCKET_NAME));
+        executeQuery(ApigwResponse.ok().entity(createApigwResponseDataTsKey().toString()).build(), createSuccessAnswerTsKeyExist());
+
+    }
+
+    /**
+     * "_ts"キーが重複した場合は"ts"キーデータで上書きされること
+     */
+    @Test
+    public void testUnderscoreTsKeyDuplicated() {
+        when(clientContext.queryParams()).thenReturn(createQueryParams(null, null, null));
+        when(clientContext.pathParams()).thenReturn(createPathParams(BUCKET_NAME));
+        executeQuery(ApigwResponse.ok().entity(createApigwResponseDataTsKey().toString()).build(), createSuccessAnswerUnderscoreTsValueOverwrite());
+
+    }
+
+    /**
      * クエリパラメータのstart, endに数値以外を設定し、400エラーとなること
      */
     @Test
     public void testInvalidQueryParameter() {
         when(clientContext.queryParams()).thenReturn(createQueryParams("start", "end", "{\"name\":\"categoryA\"}"));
         when(clientContext.pathParams()).thenReturn(createPathParams(BUCKET_NAME));
-        executeQuery(ApigwResponse.status(400).entity("Parameter Error").build(), null);
+        NbJSONObject msg = new NbJSONObject();
+        msg.put("error", "Parameter Error");
+        executeQuery(ApigwResponse.status(400).entity(msg).build(), null);
     }
 
     /**
@@ -160,7 +182,9 @@ class InfoMotionTest {
 
         when(clientContext.queryParams()).thenReturn(createQueryParams(null, null, "\"name\":\"categoryA\""));
         when(clientContext.pathParams()).thenReturn(createPathParams(BUCKET_NAME));
-        executeQuery(ApigwResponse.status(400).entity("Parameter Error").build(), null);
+        NbJSONObject msg = new NbJSONObject();
+        msg.put("error", "Parameter Error");
+        executeQuery(ApigwResponse.status(400).entity(msg).build(), null);
     }
 
     /**
@@ -198,7 +222,6 @@ class InfoMotionTest {
     }
 
     private Answer<Void> createSuccessAnswer() {
-
         return invocation -> {
 
             NbCallback<List<NbObject>> cb = invocation.getArgument(1);
@@ -221,8 +244,31 @@ class InfoMotionTest {
         };
     }
 
-    private Answer<Void> createFailureAnswer(int status, String reason) {
+    private Answer<Void> createSuccessAnswerTsKeyExist() {
 
+        return invocation -> {
+
+            NbCallback<List<NbObject>> cb = invocation.getArgument(1);
+            List<NbObject> ret = createSucceedResponseDataTsKey();
+
+            cb.onSuccess(ret);
+            return null;
+        };
+    }
+
+    private Answer<Void> createSuccessAnswerUnderscoreTsValueOverwrite() {
+
+        return invocation -> {
+
+            NbCallback<List<NbObject>> cb = invocation.getArgument(1);
+            List<NbObject> ret = createSucceedResponseDataUnderscoreTsKey();
+
+            cb.onSuccess(ret);
+            return null;
+        };
+    }
+
+    private Answer<Void> createFailureAnswer(int status, String reason) {
         return invocation -> {
 
             NbCallback<List<NbObject>> cb = invocation.getArgument(1);
@@ -327,27 +373,57 @@ class InfoMotionTest {
         NbObject obj1 = new NbObject(BUCKET_NAME);
         NbJSONObject objJson1 = new NbJSONObject();
         long timestamp1 = Long.parseLong("1540935875946");
-        objJson1.put("timestamp", timestamp1);
-        NbJSONObject valueJson1 = new NbJSONObject();
-        valueJson1.put("_id", "5bd94f53cb6a3b3739e1e92a");
-        valueJson1.put("createdAt", "2018-10-31T06:44:35.946Z");
-        valueJson1.put("updatedAt", "2018-10-31T06:44:35.946Z");
-        valueJson1.put("category", "A");
-        valueJson1.put("val", "123");
-        objJson1.put("value", valueJson1);
+        objJson1.put("_id", "5bd94f53cb6a3b3739e1e92a");
+        objJson1.put("createdAt", "2018-10-31T06:44:35.946Z");
+        objJson1.put("updatedAt", "2018-10-31T06:44:35.946Z");
+        objJson1.put("category", "A");
+        objJson1.put("val", "123");
+        objJson1.put("ts", timestamp1);
         obj1._setJsonObject(objJson1);
 
         NbObject obj2 = new NbObject(BUCKET_NAME);
         NbJSONObject objJson2 = new NbJSONObject();
         long timestamp2 = Long.parseLong("1540935876946");
-        objJson2.put("timestamp", timestamp2);
-        NbJSONObject valueJson2 = new NbJSONObject();
-        valueJson2.put("_id", "5bd94f53cb6a3b3739e1e92b");
-        valueJson2.put("createdAt", "2018-10-31T06:44:36.946Z");
-        valueJson2.put("updatedAt", "2018-10-31T06:44:36.946Z");
-        valueJson2.put("category", "A");
-        valueJson2.put("val", "456");
-        objJson2.put("value", valueJson2);
+        objJson2.put("_id", "5bd94f53cb6a3b3739e1e92b");
+        objJson2.put("createdAt", "2018-10-31T06:44:36.946Z");
+        objJson2.put("updatedAt", "2018-10-31T06:44:36.946Z");
+        objJson2.put("category", "A");
+        objJson2.put("val", "456");
+        objJson2.put("ts", timestamp2);
+        obj2._setJsonObject(objJson2);
+
+        ret.add(obj1);
+        ret.add(obj2);
+
+        return ret;
+    }
+
+
+    private List<NbObject> createApigwResponseDataTsKey() {
+        List<NbObject> ret = new ArrayList<>();
+
+        NbObject obj1 = new NbObject(BUCKET_NAME);
+        NbJSONObject objJson1 = new NbJSONObject();
+        long timestamp1 = Long.parseLong("1540935875946");
+        objJson1.put("_id", "5bd94f53cb6a3b3739e1e92a");
+        objJson1.put("createdAt", "2018-10-31T06:44:35.946Z");
+        objJson1.put("updatedAt", "2018-10-31T06:44:35.946Z");
+        objJson1.put("category", "A");
+        objJson1.put("val", "123");
+        objJson1.put("ts", timestamp1);
+        objJson1.put("_ts", "ts_value1");
+        obj1._setJsonObject(objJson1);
+
+        NbObject obj2 = new NbObject(BUCKET_NAME);
+        NbJSONObject objJson2 = new NbJSONObject();
+        long timestamp2 = Long.parseLong("1540935876946");
+        objJson2.put("_id", "5bd94f53cb6a3b3739e1e92b");
+        objJson2.put("createdAt", "2018-10-31T06:44:36.946Z");
+        objJson2.put("updatedAt", "2018-10-31T06:44:36.946Z");
+        objJson2.put("category", "A");
+        objJson2.put("val", "456");
+        objJson2.put("ts", timestamp2);
+        objJson2.put("_ts", "ts_value2");
         obj2._setJsonObject(objJson2);
 
         ret.add(obj1);
@@ -394,6 +470,58 @@ class InfoMotionTest {
         obj2.put("category", "A");
         obj2.put("val", "456");
         obj2.setUpdatedTime("2018-10-31 06:44:36.946");
+        obj2.setCreatedTime("2018-10-31T06:44:36.946Z");
+
+        ret.add(obj1);
+        ret.add(obj2);
+
+        return ret;
+    }
+
+    private List<NbObject> createSucceedResponseDataTsKey() {
+        List<NbObject> ret = new ArrayList<>();
+
+        NbObject obj1 = new NbObject(BUCKET_NAME);
+        obj1.put("_id", "5bd94f53cb6a3b3739e1e92a");
+        obj1.put("category", "A");
+        obj1.put("val", "123");
+        obj1.put("ts", "ts_value1");
+        obj1.setUpdatedTime("2018-10-31T06:44:35.946Z");
+        obj1.setCreatedTime("2018-10-31T06:44:35.946Z");
+
+        NbObject obj2 = new NbObject(BUCKET_NAME);
+        obj2.put("_id", "5bd94f53cb6a3b3739e1e92b");
+        obj2.put("category", "A");
+        obj2.put("val", "456");
+        obj2.put("ts", "ts_value2");
+        obj2.setUpdatedTime("2018-10-31T06:44:36.946Z");
+        obj2.setCreatedTime("2018-10-31T06:44:36.946Z");
+
+        ret.add(obj1);
+        ret.add(obj2);
+
+        return ret;
+    }
+
+    private List<NbObject> createSucceedResponseDataUnderscoreTsKey() {
+        List<NbObject> ret = new ArrayList<>();
+
+        NbObject obj1 = new NbObject(BUCKET_NAME);
+        obj1.put("_id", "5bd94f53cb6a3b3739e1e92a");
+        obj1.put("category", "A");
+        obj1.put("val", "123");
+        obj1.put("ts", "ts_value1");
+        obj1.put("_ts", "_ts_value1");
+        obj1.setUpdatedTime("2018-10-31T06:44:35.946Z");
+        obj1.setCreatedTime("2018-10-31T06:44:35.946Z");
+
+        NbObject obj2 = new NbObject(BUCKET_NAME);
+        obj2.put("_id", "5bd94f53cb6a3b3739e1e92b");
+        obj2.put("category", "A");
+        obj2.put("val", "456");
+        obj2.put("ts", "ts_value2");
+        obj2.put("_ts", "_ts_value2");
+        obj2.setUpdatedTime("2018-10-31T06:44:36.946Z");
         obj2.setCreatedTime("2018-10-31T06:44:36.946Z");
 
         ret.add(obj1);

@@ -1,6 +1,5 @@
 swagger: '2.0'
 basePath: /infomotion
-x-auth-appkey: false
 produces:
   - application/json
 paths:
@@ -8,4 +7,5 @@ paths:
     get:
       operationId: search
       summary: infomotion
-
+      x-acl:
+        - g:anonymous
