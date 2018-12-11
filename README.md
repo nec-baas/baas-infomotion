@@ -8,7 +8,10 @@ NEC BaaS Custom API for Enebular InfoMotion
 本APIを利用することで、NEC BaaSに蓄積したIoTデータなどのJSONオブジェクトデータを、InfoMotionを使って可視化することができます。
 
 以下にシステム構成図を示します。
-<img src="./img/baas-infomotion_システム構成図.jpg" width="80%">
+
+<div align="center">
+<img src="https://github.com/nec-baas/baas-infomotion/blob/master/img/baas-infomotion_%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%A7%8B%E6%88%90%E5%9B%B3.jpg?raw=true" width="80%" alt="システム構成図">
+</div>
 
 # カスタムAPI登録
 NEC BaaS からJSONオブジェクトデータを取得するカスタムAPIを登録します。
