@@ -197,7 +197,7 @@ class InfoMotionTest {
 
         when(clientContext.queryParams()).thenReturn(createQueryParams(null, null, "{\"name\":\"categoryA\"}"));
         when(clientContext.pathParams()).thenReturn(createPathParams("notfound"));
-        executeQuery(ApigwResponse.status(404).entity("bucket not found").build(), createFailureAnswer(404, "bucket not found"), "notfound");
+        executeQuery(ApigwResponse.status(404).entity("{\"error\":\"No such bucket\"}").build(), createFailureAnswer(404, "{\"error\":\"No such bucket\"}"), "notfound");
     }
 
     /**
