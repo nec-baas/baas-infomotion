@@ -104,7 +104,9 @@ public class InfoMotion {
                 try {
                     context.succeed(createResponse(objects));
                 } catch (ParseException e) {
-                    ApigwResponse response = ApigwResponse.status(500).contentType(MediaType.APPLICATION_JSON).entity(e.getMessage()).build();
+                    NbJSONObject msg = new NbJSONObject();
+                    msg.put("error", e.getMessage());
+                    ApigwResponse response = ApigwResponse.status(500).contentType(MediaType.APPLICATION_JSON).entity(msg).build();
                     context.fail(response);
                 }
             }

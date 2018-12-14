@@ -217,8 +217,10 @@ class InfoMotionTest {
         } catch (ParseException e) {
             err = e.getMessage();
         }
+        NbJSONObject msg = new NbJSONObject();
+        msg.put("error", err);
 
-        executeQuery(ApigwResponse.status(500).entity(err).build(), createSuccessAnswerInvalidUpdatedAt());
+        executeQuery(ApigwResponse.status(500).entity(msg).build(), createSuccessAnswerInvalidUpdatedAt());
     }
 
     private Answer<Void> createSuccessAnswer() {
