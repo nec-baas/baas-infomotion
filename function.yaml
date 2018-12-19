@@ -1,7 +1,7 @@
 search:
   code:
     bucket: CUSTOM_CODE
-    file: infomotion-7.5.0-SNAPSHOT-cloudfn.tar.gz
+    file: infomotion-7.5.0-cloudfn.tar.gz
   handler: com.nec.baas.cloudfn.InfoMotion::search
   env:
     spec: java

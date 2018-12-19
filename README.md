@@ -45,14 +45,14 @@ function.yaml の内容をコピーし、デベロッパーコンソールの Cl
 
     $ mvn verify
 
-ビルドが完了すると target フォルダ配下に 「infomotion-7.5.0-SNAPSHOT-cloudfn.tar.gz」 が作成されます。
+ビルドが完了すると target フォルダ配下に 「infomotion-7.5.0-cloudfn.tar.gz」 が作成されます。
 
 ### バケット作成
 デベロッパーコンソールのファイルバケットからバケット名を CUSTOM_CODE としてファイルバケットを作成します。
 ACL の設定は、バケット ACL 、コンテンツ ACL 共に全ての権限を空に設定してください。
 
 ### ファイル登録
-ファイルバケット一覧から作成したファイルバケットを選択し、 infomotion-7.5.0-SNAPSHOT-cloudfn.tar.gz を登録してください。
+ファイルバケット一覧から作成したファイルバケットを選択し、 infomotion-7.5.0-cloudfn.tar.gz を登録してください。
 
 # アクセス方法
 Enebular InfoMotion からの NEC BaaS カスタムAPI の呼び出し方法について説明します。
