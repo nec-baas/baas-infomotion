@@ -24,9 +24,9 @@ api.yaml の内容をコピーし、デベロッパーコンソールの API Gat
 Basic 認証を行う場合は、 x-acl の値を実行許可するユーザIDやグループ名に設定することを推奨します。以下に例を示します。
 
     x-acl:
-       - 1234567890abcdefxxxxxxxx // 特定ユーザを指定する場合
-       - g:infomotion // infomotion グループに所属するユーザを指定する場合
-       - g:authenticated // 認証ユーザ全員を指定する場合
+       - 1234567890abcdefxxxxxxxx  # 特定ユーザを指定する場合
+       - g:infomotion              # infomotion グループに所属するユーザを指定する場合
+       - g:authenticated           # 認証ユーザ全員を指定する場合
 
 ACL の詳細は、 [NEC BaaS のマニュアル](https://nec-baas.github.io/baas-manual/latest/developer/ja/developer/functions/acl.html) をご参照ください。
 
@@ -35,13 +35,13 @@ ACL の詳細は、 [NEC BaaS のマニュアル](https://nec-baas.github.io/baa
 function.yaml の内容をコピーし、デベロッパーコンソールの Cloud Functions > Functions から登録します。登録する際の名前は function.yaml の1行目に記載されている Function 名を入力してください。
 
 ## ユーザコード登録
-ユーザコードは、コンパイル済みバイナリを GitHub より取得し、登録してください。
 
-URL：https://github.com/nec-baas/baas-infomotion/releases
+### ユーザコードの取得
+ユーザコードは、コンパイル済みバイナリを [Releases](https://github.com/nec-baas/baas-infomotion/releases) より取得し、登録してください。
 
-### ビルド
+#### ビルド
 ユーザコードをソースからビルドすることも可能です。
-以下のコマンドで実行します。
+以下のコマンドでビルドします。
 
     $ mvn verify
 
@@ -55,7 +55,7 @@ ACL の設定は、バケット ACL 、コンテンツ ACL 共に全ての権限
 ファイルバケット一覧から作成したファイルバケットを選択し、 infomotion-7.5.0-SNAPSHOT-cloudfn.tar.gz を登録してください。
 
 # アクセス方法
-Enebular InfoMotion からの NEC BaaS カスタムAPI の呼び出し方法について記述します。
+Enebular InfoMotion からの NEC BaaS カスタムAPI の呼び出し方法について説明します。
 カスタムAPI の呼び出しには以下の設定を行います。
 
 * InfoType
@@ -63,9 +63,8 @@ Enebular InfoMotion からの NEC BaaS カスタムAPI の呼び出し方法に�
 * InfoMotion
 
 ## InfoType 設定
-infomotion-tool を使用して作成、もしくは以下の URL から任意の InfoType を選択します。 ここでは URL にある Enebular が提供する linechart を使用して説明します。
-
-URL：https://enebular.com/discover
+infomotion-tool を使用して作成、もしくは [Discover Assets](https://enebular.com/discover) から任意の InfoType を選択します。
+ここでは "Discover Assets" に登録されている Enebular が提供する linechart を使用して説明します。
 
 ## DataSource 設定
 Enebular のプロジェクトダッシュボードから DataSource を追加します。
@@ -84,10 +83,10 @@ DataSource 設定画面では以下の項目が設定できます。下記項目
 
 
 * テナント名(ID)、アプリケーション ID、アプリケーションキーは NEC BaaS のデベロッパーコンソール上で確認してください。
-* API 名は infomotion を指定してください。
-* サブパスには /search/{バケット名} を指定してください。バケット名は使用するバケットを指定してください。
+* API 名は "infomotion" を指定してください。
+* サブパスには "/search/{バケット名}" を指定してください。バケット名は参照するオブジェクトバケット名を指定してください。
 * 検索条件の設定は任意となります。オブジェクトクエリの検索条件と同フォーマットで where が指定できます。
-* DataSource Type は NEC BaaS との連携を行うため、 NEC-BaaS を指定してください。
+* DataSource Type は NEC BaaS との連携を行うため、"NEC-BaaS" を指定してください。
 
 ## InfoMotion 設定
 Enebular のプロジェクトダッシュボードから InfoMotion を追加します。
