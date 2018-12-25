@@ -21,6 +21,7 @@ import com.nec.baas.object.NbClause;
 import com.nec.baas.object.NbObject;
 import com.nec.baas.object.NbObjectBucket;
 import com.nec.baas.object.NbQuery;
+import org.slf4j.Logger;
 
 public class InfoMotion {
     /** QueryParameter : start */
@@ -38,9 +39,10 @@ public class InfoMotion {
         String bucketName = context.clientContext().pathParams().get(PATH_PARAM_BUCKETNAME);
         NbService nebula = context.nebula();
 
-        context.logger().debug("headers = " + context.clientContext().headers());
-        context.logger().debug("queryParams = " + context.clientContext().queryParams());
-        context.logger().debug("pathParams = " + context.clientContext().pathParams());
+        final Logger logger = context.logger();
+        logger.debug("headers = " + context.clientContext().headers());
+        logger.debug("queryParams = " + context.clientContext().queryParams());
+        logger.debug("pathParams = " + context.clientContext().pathParams());
 
         Map<String, List<String>> queryParams = context.clientContext().queryParams();
 
@@ -65,11 +67,9 @@ public class InfoMotion {
                 clause.and(endClause);
             }
         } catch (NumberFormatException e) {
-            NbJSONObject msg = new NbJSONObject();
-            msg.put("error", "Parameter Error");
-            ApigwResponse response = ApigwResponse.status(400).contentType(MediaType.APPLICATION_JSON).entity(msg).build();
+            ApigwResponse response = createErrorResponse(400, "Parameter Error");
             context.fail(response);
-            context.logger().warn("query parameter error", e);
+            logger.warn("query parameter error", e);
             return;
         }
 
@@ -77,11 +77,9 @@ public class InfoMotion {
             String whereJson = queryParams.get(QUERY_PARAM_WHERE).get(0);
             NbJSONObject whereJsonObject = NbJSONParser.parse(whereJson);
             if (whereJsonObject == null) {
-                NbJSONObject msg = new NbJSONObject();
-                msg.put("error", "Parameter Error");
-                ApigwResponse response = ApigwResponse.status(400).contentType(MediaType.APPLICATION_JSON).entity(msg).build();
+                ApigwResponse response = createErrorResponse(400, "Parameter Error");
                 context.fail(response);
-                context.logger().warn("query parameter error");
+                logger.warn("query parameter error");
                 return;
 
             }
@@ -104,17 +102,16 @@ public class InfoMotion {
                 try {
                     context.succeed(createResponse(objects));
                 } catch (ParseException e) {
-                    NbJSONObject msg = new NbJSONObject();
-                    msg.put("error", e.getMessage());
-                    ApigwResponse response = ApigwResponse.status(500).contentType(MediaType.APPLICATION_JSON).entity(msg).build();
+                    ApigwResponse response = createErrorResponse(500, e.getMessage());
                     context.fail(response);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, NbErrorInfo errorInfo) {
+                String reasonJson = errorInfo.getReason();
                 ApigwResponse response =
-                        ApigwResponse.status(statusCode).contentType(MediaType.APPLICATION_JSON).entity(errorInfo.getReason()).build();
+                        ApigwResponse.status(statusCode).contentType(MediaType.APPLICATION_JSON).entity(reasonJson).build();
                 context.fail(response);
             }
         });
@@ -140,7 +137,7 @@ public class InfoMotion {
             json.put("createdAt", object.getCreatedTime());
             json.put("updatedAt", object.getUpdatedTime());
 
-            object.keySet().forEach(key -> json.put(key, object.get(key)));
+            object.forEach(json::put);
 
             // rename ts
             if (json.containsKey("ts")) {
@@ -155,5 +152,17 @@ public class InfoMotion {
         }
 
         return ApigwResponse.ok().contentType(MediaType.APPLICATION_JSON).entity(response.toString()).build();
+    }
+
+    /**
+     * エラーレスポンス(JSON)を作成する
+     * @param statusCode ステータスコード
+     * @param message エラーメッセージ
+     * @return ApigwResponse
+     */
+    private static ApigwResponse createErrorResponse(int statusCode, String message) {
+        NbJSONObject msgJson = new NbJSONObject();
+        msgJson.put("error", message);
+        return ApigwResponse.status(statusCode).contentType(MediaType.APPLICATION_JSON).entity(msgJson).build();
     }
 }
