@@ -17,6 +17,7 @@ NEC BaaS Custom API for Enebular InfoMotion
 NEC BaaS から JSON オブジェクトデータを取得するカスタム API を登録します。
 以降の説明でテナント、アプリケーション、ユーザの入力を行うため、事前に登録してください。
 また、テナント情報の CORS 設定を有効にし、 CORS 許可ドメインに InfoMotion のドメインを追加してください。
+詳細は、[NEC BaaS のデベロッパーコンソール利用ガイド](https://nec-baas.github.io/baas-manual/latest/developer/ja/devconsole/index.html) をご参照ください。
 
 ## API 定義登録
 本プロジェクトに格納されている API 定義を登録します。
@@ -28,11 +29,11 @@ Basic 認証を行う場合は、 x-acl の値を実行許可するユーザID�
        - g:infomotion              # infomotion グループに所属するユーザを指定する場合
        - g:authenticated           # 認証ユーザ全員を指定する場合
 
-ACL の詳細は、 [NEC BaaS のマニュアル](https://nec-baas.github.io/baas-manual/latest/developer/ja/developer/functions/acl.html) をご参照ください。
+ACL の詳細は、 [NEC BaaS のデベロッパーマニュアル](https://nec-baas.github.io/baas-manual/latest/developer/ja/developer/functions/acl.html) をご参照ください。
 
 ## Function 定義登録
 本プロジェクトに格納されている Function 定義を登録します。
-function.yaml の内容をコピーし、デベロッパーコンソールの Cloud Functions > Functions から登録します。登録する際の名前は function.yaml の1行目に記載されている Function 名を入力してください。
+function.yaml の 2行目以降をコピーし、デベロッパーコンソールの Cloud Functions > Functions から登録します。登録する際の名前は function.yaml の1行目に記載されている Function 名を入力してください。
 
 ## ユーザコード登録
 
